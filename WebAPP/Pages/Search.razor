@@ -1,0 +1,90 @@
+﻿@page "/"
+@using QueryStringPOC.Infrastructure
+@using QueryStringPOC.Infrastructure.Pagination
+@using SearchRequest = QueryStringPOC.Infrastructure.SearchRequest
+
+@inject IProjectionGateway Gateway
+
+
+<PageTitle>Search</PageTitle>
+
+<h1>Elasticsearch query string</h1>
+
+<input type="text" @bind="_queryString" placeholder="Enter a query string"/>
+
+<div>
+    <h4>Fields</h4>
+    <input type="checkbox" @bind="_queryFields.Name"/> Name
+    <input type="checkbox" @bind="_queryFields.City"/> City
+</div>
+
+<div>
+    <h4>Indexes</h4>
+    <input type="checkbox" @bind="_queryIndexes.Person"/> Person
+    <input type="checkbox" @bind="_queryIndexes.Company"/> Company
+    <input type="checkbox" @bind="_queryIndexes.Product"/> Product
+</div>
+
+<button @onclick="SearchAsync">Search</button>
+
+@if (_pagedResult is not { Items.Count: > 0 })
+{
+    <p>Enter a query string and click the search button.</p>
+}
+else
+{
+    @foreach (var result in _pagedResult.Items)
+    {
+        <div>
+            <h3>@result.Title</h3>
+            <p>@result.Content</p>
+        </div>
+    }
+}
+
+@code {
+    private QueryFields _queryFields = new();
+    private QueryIndexes _queryIndexes = new();
+    private string _queryString = string.Empty;
+    private IPagedResult<ResulListItem>? _pagedResult;
+
+    private async Task SearchAsync()
+    {
+        Query query = new(_queryString);
+
+        List<string> fields = [];
+        if (_queryFields.Name) fields.Add("name");
+        if (_queryFields.City) fields.Add("city");
+
+        List<string> indexes = [];
+        if (_queryIndexes.Person) indexes.Add("person");
+        if (_queryIndexes.Company) indexes.Add("company");
+        if (_queryIndexes.Product) indexes.Add("product");
+
+        Paging paging = new(1, 10);
+        
+        SearchRequest searchRequest = new(query, fields.ToArray(), indexes.ToArray(), paging);
+
+        _pagedResult = await Gateway.SearchAsync<ResulListItem>(searchRequest, new());
+    }
+
+    public record ResulListItem
+    {
+        public string Title { get; set; } = "Undefined";
+        public string Content { get; set; } = "Undefined";
+    }
+
+    public record QueryFields
+    {
+        public bool Name { get; set; }
+        public bool City { get; set; }
+    }
+
+    public record QueryIndexes
+    {
+        public bool Person { get; set; }
+        public bool Company { get; set; }
+        public bool Product { get; set; }
+    }
+
+}

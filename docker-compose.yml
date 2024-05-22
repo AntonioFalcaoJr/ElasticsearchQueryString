@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - ELASTIC_USERNAME=search
+      - ELASTIC_PASSWORD=search
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health" ]
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300"
+  
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.6.2
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: search
+      ELASTICSEARCH_PASSWORD: search
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://kibana:5601/api/status" ]
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy 
