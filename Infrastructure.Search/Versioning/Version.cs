@@ -1,4 +1,4 @@
-﻿namespace WebAPP.Infrastructure.Versioning;
+﻿namespace Infrastructure.Search.Versioning;
 
 public record Version
 {

@@ -1,37 +1,35 @@
 ﻿@page "/"
-@using QueryStringPOC.Infrastructure
-@using QueryStringPOC.Infrastructure.Pagination
-@using SearchRequest = QueryStringPOC.Infrastructure.SearchRequest
+@using Infrastructure.Search
+@using Infrastructure.Search.Pagination
+@using SearchRequest = Infrastructure.Search.SearchRequest
 
 @inject IProjectionGateway Gateway
-
 
 <PageTitle>Search</PageTitle>
 
 <h1>Elasticsearch query string</h1>
 
+<br>
 <input type="text" @bind="_queryString" placeholder="Enter a query string"/>
 
 <div>
-    <h4>Fields</h4>
     <input type="checkbox" @bind="_queryFields.Name"/> Name
     <input type="checkbox" @bind="_queryFields.City"/> City
 </div>
 
 <div>
-    <h4>Indexes</h4>
     <input type="checkbox" @bind="_queryIndexes.Person"/> Person
     <input type="checkbox" @bind="_queryIndexes.Company"/> Company
     <input type="checkbox" @bind="_queryIndexes.Product"/> Product
 </div>
 
+<br>
+
 <button @onclick="SearchAsync">Search</button>
 
-@if (_pagedResult is not { Items.Count: > 0 })
-{
-    <p>Enter a query string and click the search button.</p>
-}
-else
+<br><br>
+
+@if (_pagedResult is { Items.Count: > 0 })
 {
     @foreach (var result in _pagedResult.Items)
     {

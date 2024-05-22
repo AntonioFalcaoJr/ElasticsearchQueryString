@@ -1,8 +1,10 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Uri = System.Uri;
 
-namespace WebAPP.Infrastructure.DependencyInjection;
+namespace Infrastructure.Search.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
@@ -15,7 +17,8 @@ public static class ServiceCollectionExtensions
             var connectionString = provider.GetRequiredService<IConfiguration>().GetConnectionString("Elasticsearch");
             
             var settings = new ElasticsearchClientSettings(new Uri(connectionString))
-                .Authentication(new BasicAuthentication("search", "search"));
+                .Authentication(new BasicAuthentication("search", "search"))
+                .EnableHttpCompression(false);
             
             return new ElasticsearchClient(settings);
         });

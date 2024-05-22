@@ -1,4 +1,4 @@
-namespace WebAPI;
+namespace WebAPI.Models;
 
 public record Person
 {
