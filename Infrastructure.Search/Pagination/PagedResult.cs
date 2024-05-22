@@ -1,41 +1,28 @@
 namespace Infrastructure.Search.Pagination;
 
-public interface IPagedResult<out TProjection>
+public record PagedResult<TResult> : IPagedResult<TResult>
+    where TResult : class
 {
-    IReadOnlyCollection<TProjection> Items { get; }
-    Page Page { get; }
-}
-
-public record Page
-{
-    public int Number { get; init; }
-    public int Size { get; init; }
-    public bool HasPrevious { get; init; }
-    public bool HasNext { get; init; }
-}
-
-public record PagedResult<TProjection> : IPagedResult<TProjection>
-{
-    private readonly IReadOnlyCollection<TProjection> _projections;
+    private readonly IEnumerable<IProjection<TResult>> _projections;
     private readonly Paging _paging;
 
-    private PagedResult(IReadOnlyCollection<TProjection> projections, Paging paging)
+    private PagedResult(IEnumerable<IProjection<TResult>> projections, Paging paging)
     {
         _projections = projections;
         _paging = paging;
     }
 
-    public IReadOnlyCollection<TProjection> Items
+    public IEnumerable<IProjection<TResult>> Items
         => Page.HasNext ? _projections.Take(_paging.Size).ToList() : _projections;
 
     public Page Page => new()
     {
         Number = _paging.Number,
-        Size = _projections.Count,
-        HasNext = _projections.Count > _paging.Size,
+        Size = _paging.Size,
+        HasNext = _projections.Count() > _paging.Size,
         HasPrevious = _paging.Number > 1
     };
 
-    public static IPagedResult<TProjection> Create(IReadOnlyCollection<TProjection> projections, Paging paging) 
-        => new PagedResult<TProjection>(projections, paging);
+    public static IPagedResult<TResult> Create(IEnumerable<IProjection<TResult>> projections, Paging paging)
+        => new PagedResult<TResult>(projections, paging);
 }
