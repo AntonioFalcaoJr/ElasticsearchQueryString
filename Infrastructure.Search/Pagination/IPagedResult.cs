@@ -1,7 +1,7 @@
 namespace Infrastructure.Search.Pagination;
 
-public interface IPagedResult<out TProjection>
+public interface IPagedResult<out TResult>
 {
-    IEnumerable<IProjection<TProjection>> Items { get; }
+    IEnumerable<TResult> Items { get; }
     Page Page { get; }
 }
