@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         {
             var connectionString = provider.GetRequiredService<IConfiguration>().GetConnectionString("Elasticsearch");
             
-            var settings = new ElasticsearchClientSettings(new Uri(connectionString))
+            var settings = new ElasticsearchClientSettings(new Uri(connectionString!))
                 .Authentication(new BasicAuthentication("search", "search"))
                 .EnableHttpCompression(false);
             

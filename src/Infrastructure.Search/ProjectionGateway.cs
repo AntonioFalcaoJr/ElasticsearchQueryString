@@ -8,7 +8,8 @@ public record SearchRequest(Query Query, Indices Indices, Fields Fields, Paging 
 
 public class ProjectionGateway(ElasticsearchClient client) : IProjectionGateway
 {
-    public async ValueTask<IPagedResult<IProjection<THit>>> SearchAsync<THit>(SearchRequest request, CancellationToken token)
+    public async ValueTask<IPagedResult<IProjection<THit>>> SearchAsync<THit>(SearchRequest request,
+        CancellationToken token)
         where THit : class
     {
         var from = (request.Paging.Number - 1) * request.Paging.Size;
@@ -34,7 +35,6 @@ public class ProjectionGateway(ElasticsearchClient client) : IProjectionGateway
                     }));
 
             search.From(from).Size(size);
-            
         }, token);
 
         if (response.IsValidResponse is false)
@@ -46,5 +46,5 @@ public class ProjectionGateway(ElasticsearchClient client) : IProjectionGateway
     }
 
     public Task IndexAsync<TDocument>(TDocument document, CancellationToken token) where TDocument : notnull
-        => client.IndexAsync(document, document.GetType().Name.ToLower(), token);
+        => client.IndexAsync(document, index => index.Index(typeof(TDocument).Name.ToLower()), token);
 }
