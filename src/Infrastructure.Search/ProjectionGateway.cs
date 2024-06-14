@@ -8,8 +8,7 @@ public record SearchRequest(Query Query, Indices Indices, Fields Fields, Paging 
 
 public class ProjectionGateway(ElasticsearchClient client) : IProjectionGateway
 {
-    public async ValueTask<IPagedResult<IProjection<THit>>> SearchAsync<THit>(SearchRequest request,
-        CancellationToken token)
+    public async ValueTask<IPagedResult<IProjection<THit>>> SearchAsync<THit>(SearchRequest request, CancellationToken token)
         where THit : class
     {
         var from = (request.Paging.Number - 1) * request.Paging.Size;
