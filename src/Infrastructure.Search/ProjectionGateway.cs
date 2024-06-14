@@ -34,6 +34,7 @@ public class ProjectionGateway(ElasticsearchClient client) : IProjectionGateway
                     }));
 
             search.From(from).Size(size);
+            
         }, token);
 
         if (response.IsValidResponse is false)
